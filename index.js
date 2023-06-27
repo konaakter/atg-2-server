@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = "mongodb+srv://atgtasktow:wTnjftEGPBnhKQbT@cluster0.ah3a7qz.mongodb.net/?retryWrites=true&w=majority";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -112,7 +112,28 @@ async function run() {
             res.send(getresult)
           });
 
-          
+          app.delete('/sletedpost/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await postcollection.deleteOne(query);
+            res.send(result);
+          })
+
+          app.patch('/updatepost/:id', async (req, res)=>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id) };
+            const upadate = req.body
+            const options = { upsert: true };
+            const updateDoc = {
+              $set: {
+                details:upadate.details,
+                header: upadate.header
+              },
+            };
+            const updateresult = await postcollection.updateOne(query, updateDoc, options);
+            res.send(updateresult)
+          } )
+        
 
 
         await client.db("admin").command({ ping: 1 });
